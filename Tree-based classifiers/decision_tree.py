@@ -2,7 +2,7 @@ import numpy as np
 from tree_node import Node
 
 class DecisionTreeClassifier:
-    def __init(self, *, criterion='gini', splitter='best', max_depth=None, min_samples_split=2, min_samples_leaf=1):
+    def __init__(self, *, criterion='gini', splitter='best', max_depth=None, min_samples_split=2, min_samples_leaf=1):
         self.criterion = criterion
         self.splitter = splitter
         self.max_depth = max_depth
@@ -19,6 +19,8 @@ class DecisionTreeClassifier:
                 ---feature_1
                 ---feature_2
                 ---feature_3
+
+            labels are a list of classes each sample belongs to, assumed to be encoded to range from 0 to n-1
         '''
         # if number of samples is less than the min_samples_split parameter, dont split
         m = labels.size
@@ -34,7 +36,7 @@ class DecisionTreeClassifier:
         for idx in range(len(data.columns)): # loop through every feature
             # thresholds is a list of feature values, 
             thresholds, classes = zip(*   # the * indicates unzipping operation
-                                    sorted( zip(data[:, idx], labels) ) # zip data with labels and sort it based on values of the feature in the current loop 
+                                    sorted( zip(data.iloc[:, idx], labels) ) # zip data with labels and sort it based on values of the feature in the current loop 
                                     )
 
             # num_left and num_right are 2 lists which have the same number of elements, each element corresponds to a class.
