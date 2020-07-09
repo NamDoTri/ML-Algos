@@ -7,7 +7,7 @@ class DecisionTreeClassifier:
         self.criterion = criterion
         self.splitter = splitter
         self.max_depth = max_depth
-        self.min_samples_spit = min_samples_split
+        self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.n_classes = 0
         self.n_features = 0
@@ -21,14 +21,14 @@ class DecisionTreeClassifier:
                 ---feature_2
                 ---feature_3
         '''
-        # if number of samples is less than two, dont split
+        # if number of samples is less than the min_samples_split parameter, dont split
         m = labels.size
-        if m < 2: return None, None
+        if m < self.min_samples_split: return None, None
 
         # number of samples in each class passed into this node
         num_parent = [np.sum(labels == c) for c in range(self.n_classes)]
 
-        # Gini of the current node (to see if it should or shouldn't be split in case there's no split which gives a lower Gini than the current one)
+        # Gini of the current node (to see if it should or shouldn't be split further in case there's no split which gives a lower Gini than the current one)
         best_gini = 1.0 - sum(k**2/m for k in num_parent)
         best_index, best_threshold = None, None
 
@@ -72,11 +72,34 @@ class DecisionTreeClassifier:
         num_samples_per_class = [np.sum(y == i) for i in range(self.n_classes)]
         predicted_class = np.argmax(num_samples_per_class)
         node = Node(
-            gini=self._gini(y)
+            # gini=self._gini(y)  # to be implemented
+            num_samples=y.size,
+            num_samples_per_class=num_samples_per_class,
+            predicted_class=predicted_class
         )
-        pass
+        
+        index, threshold = self.best_split(X, y)
+        if index is not None or depth < self.max_depth: # todo: consider also min_samples_leaf parameter
+            indexes_left = X[:, index] < threshold  # a list of Trues and Falses to filter input samples to the next node
+            X_left, y_left = X[indexes_left], y[indexes_left]
+            X_right, y_right = X[~indexes_left], y[~indexes_left] # ~ is a bitwise NOT, which changes each element is list indexes_left to the opposite
+            node.feature_index = index
+            node.threshold = threshold
+            ## recursively split until max_depth is achieved or node is pure
+            # new node is attached to the old node as either node.left or node.right attribute
+            node.left = self.grow_tree(X_left, y_left, depth + 1)
+            node.right = self.grow_tree(X_right, y_right, depth + 1)
+
+        return node
 
     def fit(self, X, y):
-        pass
+        if self.criterion == 'gini':
+            # implement here
+            self.n_classes = len(set(y))
+            self.n_features = X.shape[1]
+            self.tree_ = self.grow_tree(X, y)
+        elif self.criterion == 'entropy':
+            # to be implemented
+            pass
 
 
