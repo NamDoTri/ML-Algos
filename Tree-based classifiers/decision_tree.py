@@ -2,7 +2,7 @@ import numpy as np
 from tree_node import Node
 
 class DecisionTreeClassifier:
-    def __init(self, *, criterion='gini', splitter='best', max_depth=None, min_samples_split=None, min_samples_leaf=None):
+    def __init(self, *, criterion='gini', splitter='best', max_depth=None, min_samples_split=2, min_samples_leaf=1):
         self.criterion = criterion
         self.splitter = splitter
         self.max_depth = max_depth
