@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.preprocessing import LabelEncoder as le
 from tree_node import Node
 
 class DecisionTreeClassifier:
@@ -101,5 +100,15 @@ class DecisionTreeClassifier:
         elif self.criterion == 'entropy':
             # to be implemented
             pass
+
+    def predict_individual(self, input):
+        node = self.tree_ 
+        while node.left:
+            node = node.left if input[node.feature_index] < node.threshold else node.right
+        return node.predicted_class
+
+    
+    def predict(self, X):
+        return [self.predict_individual(input) for input in X]
 
 
